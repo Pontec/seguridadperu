@@ -1,12 +1,16 @@
 package com.utp.seguridadperu.service.impl;
 
+import com.utp.seguridadperu.Repository.ImagenRepository;
 import com.utp.seguridadperu.Repository.IncideciaRepository;
 import com.utp.seguridadperu.agregates.dto.IncidenciaHeatmapData;
+import com.utp.seguridadperu.modelo.Imagen;
 import com.utp.seguridadperu.modelo.Incidencia;
 import com.utp.seguridadperu.service.IncidenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +19,9 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
     @Autowired
     private IncideciaRepository incideciaRepository;
+
+    @Autowired
+    private ImagenRepository imagenRepository;
 
     @Override
     public Incidencia saveIncidencia(Incidencia incidencia) {
@@ -42,4 +49,24 @@ public class IncidenciaServiceImpl implements IncidenciaService {
     public List<IncidenciaHeatmapData> findGroupedIncidencias() {
         return incideciaRepository.findGroupedIncidencias();
     }
+
+    @Override
+    public Incidencia saveIncidenciaConImagenes(String tipo, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException {
+        Incidencia incidencia = new Incidencia();
+        incidencia.setTipo(tipo);
+        incidencia.setDescripcion(descripcion);
+        incidencia.setLatitud(latitud);
+        incidencia.setLongitud(longitud);
+        incidencia.setFechaHora(LocalDateTime.now());
+
+        for (MultipartFile archivo : imagenes) {
+            Imagen imagen = new Imagen();
+            imagen.setData(archivo.getBytes()); // Guarda el contenido binario de la imagen
+            imagen.setIncidencia(incidencia);
+            incidencia.getImagenes().add(imagen);
+        }
+
+        return incideciaRepository.save(incidencia);
+    }
+
 }
