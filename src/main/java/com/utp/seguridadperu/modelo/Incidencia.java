@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,4 +27,7 @@ public class Incidencia {
     private double longitud;
     @Column(name = "fecha_hora")
     private LocalDateTime fechaHora;
+
+    @OneToMany(mappedBy = "incidencia", cascade = CascadeType.ALL)
+    private List<Imagen> imagenes = new ArrayList<>();
 }
