@@ -1,5 +1,6 @@
 package com.utp.seguridadperu.modelo;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,5 +30,15 @@ public class Incidencia {
     private LocalDateTime fechaHora;
 
     @OneToMany(mappedBy = "incidencia", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Imagen> imagenes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "incidencia", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Comentario> comentarios = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_usuario")
+    private UsuarioModelo usuario;
+
 }

@@ -1,5 +1,6 @@
 package com.utp.seguridadperu.modelo;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Imagen {
 
     @ManyToOne
     @JoinColumn(name = "incidencia_id")
+    @JsonBackReference
     private Incidencia incidencia;
 
 }

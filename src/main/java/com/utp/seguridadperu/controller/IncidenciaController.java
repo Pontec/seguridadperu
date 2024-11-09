@@ -30,8 +30,9 @@ public class IncidenciaController {
             @RequestParam String descripcion,
             @RequestParam double latitud,
             @RequestParam double longitud,
+            @RequestParam Long usuarioId,
             @RequestParam List<MultipartFile> imagenes) throws IOException {
-        Incidencia incidencia = incidenciaService.saveIncidenciaConImagenes(tipo, descripcion, latitud, longitud, imagenes);
+        Incidencia incidencia = incidenciaService.saveIncidenciaConImagenes(tipo, descripcion, latitud, longitud, usuarioId, imagenes);
         return ResponseEntity.ok(incidencia);
     }
 

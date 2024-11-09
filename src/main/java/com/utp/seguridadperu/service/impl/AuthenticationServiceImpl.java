@@ -39,7 +39,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         empleadosEntity.setTelefono(signUpRequest.getTelefono());
         empleadosEntity.setDireccion(signUpRequest.getDireccion());
         Set<Rol> assginedRoles = new HashSet<>();
-        Rol userRol = rolRepository.findByNombreRol(Role.ADMIN.name()).orElseThrow(() -> new RuntimeException("EL ROL NO EXISTE, REVISA TU BD"));
+        Rol userRol = rolRepository.findByNombreRol(Role.ADMIN.name()).orElseGet(() -> {
+            Rol rol = new Rol();
+            rol.setNombreRol(Role.ADMIN.name());
+            return rolRepository.save(rol);
+        });
         assginedRoles.add(userRol);
         empleadosEntity.setRoles(assginedRoles);
         empleadosEntity.setPassword(new BCryptPasswordEncoder().encode(signUpRequest.getPassword()));
