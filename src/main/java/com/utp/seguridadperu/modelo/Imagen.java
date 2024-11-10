@@ -19,10 +19,7 @@ public class Imagen {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
-    private byte[] data;
-
-
+    private String url;
 
     @ManyToOne
     @JoinColumn(name = "incidencia_id")

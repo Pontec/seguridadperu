@@ -34,7 +34,7 @@ public class GoogleDrive {
         Res res = new Res();
 
         try {
-            String folderId = "1tQ_fmWezz6aawdBEs-ognhSdI2FaFVny?hl=es-419";
+            String folderId = "1tQ_fmWezz6aawdBEs-ognhSdI2FaFVny";
             Drive drive = createDriveService();
             com.google.api.services.drive.model.File fileMetaData = new com.google.api.services.drive.model.File();
             fileMetaData.setName(file.getName());
@@ -68,6 +68,7 @@ public class GoogleDrive {
                 GoogleNetHttpTransport.newTrustedTransport(),
                 JSON_FACTORY,
                 credential)
+                .setApplicationName("SeguridadPeru")
                 .build();
     }
 

@@ -5,6 +5,8 @@ import com.utp.seguridadperu.Repository.IncideciaRepository;
 import com.utp.seguridadperu.Repository.UsuarioRepository;
 import com.utp.seguridadperu.agregates.dto.IncidenciaDTO;
 import com.utp.seguridadperu.agregates.dto.IncidenciaHeatmapData;
+import com.utp.seguridadperu.agregates.response.Res;
+import com.utp.seguridadperu.configuracion.GoogleDrive;
 import com.utp.seguridadperu.modelo.Imagen;
 import com.utp.seguridadperu.modelo.Incidencia;
 import com.utp.seguridadperu.modelo.UsuarioModelo;
@@ -16,10 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +38,9 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private GoogleDrive googleDriveService;
 
     @Override
     public Incidencia saveIncidencia(Incidencia incidencia, Long idUsuario) {
@@ -74,7 +80,7 @@ public class IncidenciaServiceImpl implements IncidenciaService {
     }
 
     @Override
-    public Incidencia saveIncidenciaConImagenes(String tipo, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException {
+    public Incidencia saveIncidenciaConImagenes(String tipo, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException, GeneralSecurityException {
         Incidencia incidencia = new Incidencia();
         incidencia.setTipo(tipo);
         incidencia.setDescripcion(descripcion);
@@ -83,10 +89,21 @@ public class IncidenciaServiceImpl implements IncidenciaService {
         incidencia.setFechaHora(LocalDateTime.now());
 
         for (MultipartFile archivo : imagenes) {
-            Imagen imagen = new Imagen();
-            imagen.setData(archivo.getBytes()); // Guarda el contenido binario de la imagen
-            imagen.setIncidencia(incidencia);
-            incidencia.getImagenes().add(imagen);
+            // Crear un archivo temporal para subir a Google Drive
+            File tempFile = File.createTempFile("temp", null);
+            archivo.transferTo(tempFile);
+
+            // Subir el archivo a Google Drive y obtener la URL
+            Res res = googleDriveService.uploadImageToDrive(tempFile);
+            if (res.getStatus() == 200) {
+                Imagen imagen = new Imagen();
+                imagen.setUrl(res.getUrl()); // Guarda la URL de la imagen
+                imagen.setIncidencia(incidencia);
+                incidencia.getImagenes().add(imagen);
+            }
+
+            // Eliminar el archivo temporal
+            tempFile.delete();
         }
 
         return incideciaRepository.save(incidencia);
@@ -96,7 +113,6 @@ public class IncidenciaServiceImpl implements IncidenciaService {
         // Obtén la página de Incidencia desde el repositorio
         Page<Incidencia> incidencias = incideciaRepository.findAll(pageable);
 
-        // Convierte el contenido de Incidencia a IncidenciaDto
         List<IncidenciaDTO> incidenciaDtos = incidencias.getContent().stream().map(incidencia -> {
             IncidenciaDTO dto = new IncidenciaDTO();
             dto.setId(incidencia.getId());
@@ -106,18 +122,16 @@ public class IncidenciaServiceImpl implements IncidenciaService {
             dto.setLongitud(incidencia.getLongitud());
             dto.setFechaHora(incidencia.getFechaHora());
 
-            // Convertir cada imagen binaria a Base64 y agregarla a la lista de imágenes en el DTO
-            List<String> imagenesBase64 = incidencia.getImagenes().stream()
-                    .map(imagen -> "data:image/jpeg;base64," + Base64Utils.encodeToString(imagen.getData()))
+            // Agregar las URLs de las imágenes al DTO
+            List<String> imagenesUrls = incidencia.getImagenes().stream()
+                    .map(Imagen::getUrl)
                     .collect(Collectors.toList());
-            dto.setImagenes(imagenesBase64);
+            dto.setImagenes(imagenesUrls);
 
             return dto;
         }).collect(Collectors.toList());
 
-        // Crea una nueva instancia de PageImpl usando la lista de DTOs y los datos de paginación
         return new PageImpl<>(incidenciaDtos, pageable, incidencias.getTotalElements());
     }
-
 
 }
