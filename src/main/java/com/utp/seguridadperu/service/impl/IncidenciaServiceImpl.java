@@ -95,6 +95,7 @@ public class IncidenciaServiceImpl implements IncidenciaService {
 
             // Subir el archivo a Google Drive y obtener la URL
             Res res = googleDriveService.uploadImageToDrive(tempFile);
+
             if (res.getStatus() == 200) {
                 Imagen imagen = new Imagen();
                 imagen.setUrl(res.getUrl()); // Guarda la URL de la imagen

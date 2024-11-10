@@ -4,6 +4,7 @@ import com.utp.seguridadperu.modelo.Denuncia;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 public interface DenunciaService {
@@ -15,7 +16,7 @@ public interface DenunciaService {
             double latitud,
             double longitud,
             List<MultipartFile> imagenes
-    ) throws IOException;
+    ) throws IOException, GeneralSecurityException;
 
     List<Denuncia> getAllDenuncias();
 

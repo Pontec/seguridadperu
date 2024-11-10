@@ -21,11 +21,12 @@ public class Denuncia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tipo;
+    private String asunto;
     private String descripcion;
     private LocalDateTime fechaHora;
     private double latitud;
     private double longitud;
+
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")

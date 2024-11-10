@@ -3,6 +3,8 @@ package com.utp.seguridadperu.service.impl;
 import com.utp.seguridadperu.Repository.DenunciaRepository;
 import com.utp.seguridadperu.Repository.ImagenRepository;
 import com.utp.seguridadperu.Repository.UsuarioRepository;
+import com.utp.seguridadperu.agregates.response.Res;
+import com.utp.seguridadperu.configuracion.GoogleDrive;
 import com.utp.seguridadperu.modelo.Denuncia;
 import com.utp.seguridadperu.modelo.Imagen;
 import com.utp.seguridadperu.modelo.UsuarioModelo;
@@ -11,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,41 +31,55 @@ public class DenunciaServiceImpl implements DenunciaService {
     @Autowired
     private ImagenRepository imagenRepository;
 
-    public Denuncia saveDenunciaConImagenes(
-            Long usuarioId,
-            String tipo,
-            String descripcion,
-            double latitud,
-            double longitud,
-            List<MultipartFile> imagenes
-    ) throws IOException {
+
+    @Autowired
+    private GoogleDrive googleDriveService;
+
+    public Denuncia saveDenunciaConImagenes(Long usuarioId, String asunto, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException, GeneralSecurityException {
         // Buscar el usuario por ID
         UsuarioModelo usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Crear una nueva denuncia
         Denuncia denuncia = new Denuncia();
+
         denuncia.setUsuario(usuario);
-        denuncia.setTipo(tipo);
+
+        denuncia.setAsunto(asunto);
+
         denuncia.setDescripcion(descripcion);
+
         denuncia.setLatitud(latitud);
         denuncia.setLongitud(longitud);
+
         denuncia.setFechaHora(LocalDateTime.now());
 
-        // Guardar la denuncia para obtener su ID
-        Denuncia denunciaGuardada = denunciaRepository.save(denuncia);
 
-        // Guardar las imágenes
-        if (imagenes != null && !imagenes.isEmpty()) {
-            for (MultipartFile file : imagenes) {
+
+        for (MultipartFile archivo : imagenes) {
+            // Crear un archivo temporal para subir a Google Drive
+            File tempFile = File.createTempFile("temp", null);
+            archivo.transferTo(tempFile);
+
+            // Subir el archivo a Google Drive y obtener la URL
+            Res res = googleDriveService.uploadImageToDrive(tempFile);
+
+            if (res.getStatus() == 200) {
                 Imagen imagen = new Imagen();
-                //imagen.setUrl(file.getBytes());
-                imagen.setDenuncia(denunciaGuardada);
-                imagenRepository.save(imagen);
+
+                imagen.setUrl(res.getUrl()); // Guarda la URL de la imagen
+                imagen.setDenuncia(denuncia);
+                denuncia.getImagenes().add(imagen);
             }
+
+            // Eliminar el archivo temporal
+            tempFile.delete();
         }
 
-        return denunciaGuardada;
+        // Guardar la denuncia para obtener su ID
+        return denunciaRepository.save(denuncia);
+
+
     }
 
     @Override

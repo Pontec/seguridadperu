@@ -1,6 +1,9 @@
 package com.utp.seguridadperu.agregates.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MessageDTO {
 
@@ -56,5 +59,63 @@ public class MessageDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public static class DenunciaDto {
+        public Long usuarioId;
+        public String asunto;
+        public String descripcion;
+        public double latitud;
+        public double longitud;
+
+        List<MultipartFile> imagenes;
+
+        public Long getUsuarioId() {
+            return usuarioId;
+        }
+
+        public void setUsuarioId(Long usuarioId) {
+            this.usuarioId = usuarioId;
+        }
+
+        public String getAsunto() {
+            return asunto;
+        }
+
+        public void setAsunto(String asunto) {
+            this.asunto = asunto;
+        }
+
+        public String getDescripcion() {
+            return descripcion;
+        }
+
+        public void setDescripcion(String descripcion) {
+            this.descripcion = descripcion;
+        }
+
+        public double getLatitud() {
+            return latitud;
+        }
+
+        public void setLatitud(double latitud) {
+            this.latitud = latitud;
+        }
+
+        public double getLongitud() {
+            return longitud;
+        }
+
+        public void setLongitud(double longitud) {
+            this.longitud = longitud;
+        }
+
+        public List<MultipartFile> getImagenes() {
+            return imagenes;
+        }
+
+        public void setImagenes(List<MultipartFile> imagenes) {
+            this.imagenes = imagenes;
+        }
     }
 }

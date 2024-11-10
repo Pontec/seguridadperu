@@ -112,6 +112,12 @@ public class ChatController {
     }
 
 
+    @MessageMapping("/activate-sound")
+    public void activateSound() {
+        simpMessagingTemplate.convertAndSend("/chatroom/activate-sound", "activar");
+        System.out.println("Notificación de activación de sonido enviada a todos los clientes conectados.");
+    }
+
 
 }
 
