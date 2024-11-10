@@ -55,12 +55,17 @@ public class DenunciaServiceImpl implements DenunciaService {
         if (imagenes != null && !imagenes.isEmpty()) {
             for (MultipartFile file : imagenes) {
                 Imagen imagen = new Imagen();
-                //imagen.setUrl(file.getBytes());
+                imagen.setData(file.getBytes());
                 imagen.setDenuncia(denunciaGuardada);
                 imagenRepository.save(imagen);
             }
         }
 
         return denunciaGuardada;
+    }
+
+    @Override
+    public List<Denuncia> getAllDenuncias() {
+        return denunciaRepository.findAll();
     }
 }
