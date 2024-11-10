@@ -40,5 +40,7 @@ public class Incidencia {
     private List<Imagen> imagenes = new ArrayList<>();
 
 
-
+    public Incidencia(Long id) {
+        this.id = id;
+    }
 }
