@@ -73,4 +73,9 @@ public class UsuarioModelo implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+    //Relacionando con la tabla de incidencia
+    @OneToMany(mappedBy = "usuario")
+    private Set<Incidencia> incidencias = new HashSet<>();
 }
