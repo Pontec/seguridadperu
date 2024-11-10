@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 public interface IncidenciaService {
@@ -17,7 +18,7 @@ public interface IncidenciaService {
     List<Incidencia> getAllIncidencias();
 
     List<IncidenciaHeatmapData> findGroupedIncidencias();
-    Incidencia saveIncidenciaConImagenes(String tipo, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException;
+    Incidencia saveIncidenciaConImagenes(String tipo, String descripcion, double latitud, double longitud, List<MultipartFile> imagenes) throws IOException, GeneralSecurityException;
 
     Page<IncidenciaDTO> getAllIncidencias(Pageable pageable);
 

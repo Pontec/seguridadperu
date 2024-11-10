@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,7 @@ public class IncidenciaController {
             @RequestParam String descripcion,
             @RequestParam double latitud,
             @RequestParam double longitud,
-            @RequestParam (value = "imagenes", required = false) List<MultipartFile> imagenes) throws IOException {
+            @RequestParam (value = "imagenes", required = false) List<MultipartFile> imagenes) throws IOException, GeneralSecurityException {
         Incidencia incidencia = incidenciaService.saveIncidenciaConImagenes(tipo, descripcion, latitud, longitud, imagenes);
         return ResponseEntity.ok(incidencia);
     }
