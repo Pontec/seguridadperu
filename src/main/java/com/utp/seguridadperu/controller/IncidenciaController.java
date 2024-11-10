@@ -1,9 +1,12 @@
 package com.utp.seguridadperu.controller;
 
+import com.utp.seguridadperu.agregates.dto.IncidenciaDTO;
 import com.utp.seguridadperu.agregates.dto.IncidenciaHeatmapData;
 import com.utp.seguridadperu.modelo.Incidencia;
 import com.utp.seguridadperu.service.IncidenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +33,7 @@ public class IncidenciaController {
             @RequestParam String descripcion,
             @RequestParam double latitud,
             @RequestParam double longitud,
-            @RequestParam List<MultipartFile> imagenes) throws IOException {
+            @RequestParam (value = "imagenes", required = false) List<MultipartFile> imagenes) throws IOException {
         Incidencia incidencia = incidenciaService.saveIncidenciaConImagenes(tipo, descripcion, latitud, longitud, imagenes);
         return ResponseEntity.ok(incidencia);
     }
@@ -55,4 +58,13 @@ public class IncidenciaController {
     public List<IncidenciaHeatmapData> getHeatmapData() {
         return incidenciaService.findGroupedIncidencias();
     }
+
+    //Solo las 10 primeras incidencias
+    @GetMapping("/ultimos")
+    public ResponseEntity<Page<IncidenciaDTO>> getUltimos() {
+        Page<IncidenciaDTO> ultimasIncidencias = incidenciaService.getAllIncidencias(PageRequest.of(0, 10));
+        return new ResponseEntity<>(ultimasIncidencias, HttpStatus.OK);
+    }
+
 }
+
