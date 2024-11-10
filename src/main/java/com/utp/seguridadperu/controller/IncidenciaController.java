@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -22,10 +24,21 @@ public class IncidenciaController {
         return new ResponseEntity<>(incidenciaService.getAllIncidencias(), HttpStatus.OK);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<?> saveIncidencia(@RequestBody Incidencia incidencia) {
-        return new ResponseEntity<>(incidenciaService.saveIncidencia(incidencia), HttpStatus.CREATED);
+    @PostMapping("/crear")
+    public ResponseEntity<Incidencia> crearIncidencia(
+            @RequestParam String tipo,
+            @RequestParam String descripcion,
+            @RequestParam double latitud,
+            @RequestParam double longitud,
+            @RequestParam List<MultipartFile> imagenes) throws IOException {
+        Incidencia incidencia = incidenciaService.saveIncidenciaConImagenes(tipo, descripcion, latitud, longitud, imagenes);
+        return ResponseEntity.ok(incidencia);
     }
+
+//    @PostMapping("/save")
+//    public ResponseEntity<?> saveIncidencia(@RequestBody Incidencia incidencia) {
+//        return new ResponseEntity<>(incidenciaService.saveIncidencia(incidencia), HttpStatus.CREATED);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getIncidencia(Long id) {
