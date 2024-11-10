@@ -16,4 +16,8 @@ public interface DenunciaService {
             double longitud,
             List<MultipartFile> imagenes
     ) throws IOException;
+
+    List<Denuncia> getAllDenuncias();
+
+
 }
