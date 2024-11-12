@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<UsuarioModelo, Long> {
     Optional<UsuarioModelo> findByCorreo(String email);
+
+    Optional<UsuarioModelo> findByNumDoc(String dni);
 }
